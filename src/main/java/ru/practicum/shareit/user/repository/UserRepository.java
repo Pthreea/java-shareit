@@ -1,31 +1,20 @@
 package ru.practicum.shareit.user.repository;
 
-import org.springframework.stereotype.Component;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
+import java.util.Optional;
 
-@Component
-public class UserRepository {
-    private final AtomicLong idCounter = new AtomicLong(0);
-    private final Map<Long, User> users = new HashMap<>();
+public interface UserRepository {
+    User save(User user);
 
-    public User save(User user) {
-        if (user.getId() == null) {
-            long newId = idCounter.incrementAndGet();
-            user.setId(newId);
-        }
-        users.put(user.getId(), user);
-        return user;
-    }
+    Optional<User> findById(Long id);
 
-    public Optional<User> findById(Long id) {
-        return Optional.ofNullable(users.get(id));
-    }
+    List<User> findAll();
 
-    public void delete(Long id) {
-        users.remove(id);
-    }
+    void deleteById(Long id);
+
+    boolean existsById(Long id);
+
+    boolean existsByEmail(String email);
 }

@@ -1,12 +1,13 @@
 package ru.practicum.shareit.user.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.Service.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.service.UserService;
 
+import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -14,32 +15,30 @@ import ru.practicum.shareit.user.dto.UserDto;
 public class UserController {
     private final UserService userService;
 
-    // Создание пользователя: POST /users
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@Valid @RequestBody UserDto userDto) {
         return userService.createUser(userDto);
     }
 
-    // Получение пользователя по ID: GET /users/{userId}
+    @PatchMapping("/{userId}")
+    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        return userService.updateUser(userId, userDto);
+    }
+
     @GetMapping("/{userId}")
     public UserDto getUserById(@PathVariable Long userId) {
         return userService.getUserById(userId);
     }
 
-    // Обновление пользователя: PATCH /users/{userId}
-    @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId,
-                              @RequestBody UserDto userDto) {  // Без @Valid для PATCH
-        return userService.updateUser(userDto, userId);
+    @GetMapping
+    public List<UserDto> getAllUsers() {
+        return userService.getAllUsers();
     }
 
-    // Удаление пользователя: DELETE /users/{userId}
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
     }
-
-
 }
