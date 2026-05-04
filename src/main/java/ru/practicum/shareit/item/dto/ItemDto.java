@@ -24,5 +24,6 @@ public class ItemDto {
     @NotNull(message = "Available field is required")
     private Boolean available;
 
+    private Long ownerId;
     private Long requestId;
 }

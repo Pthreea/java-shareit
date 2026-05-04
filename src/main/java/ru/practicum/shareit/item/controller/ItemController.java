@@ -1,39 +1,34 @@
 package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-
-import java.util.List;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
+
+import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
     private final ItemService itemService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemDto createItem(@RequestBody ItemDto itemDto,
-                              @RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId) {
-        if (userId == null) {
-            throw new RuntimeException("Требуется заголовок X-Sharer-User-Id");
-        }
-        return itemService.createItem(itemDto, userId);
+    public ItemDto createItem(@RequestHeader(USER_ID_HEADER) Long userId,
+                              @Valid @RequestBody ItemDto itemDto) {
+        return itemService.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@PathVariable Long itemId,
-                              @RequestBody ItemDto itemDto,
-                              @RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId) {
-        if (userId == null) {
-            throw new RuntimeException("Требуется заголовок X-Sharer-User-Id");
-        }
-        return itemService.updateItem(itemDto, itemId, userId);
+    public ItemDto updateItem(@RequestHeader(USER_ID_HEADER) Long userId,
+                              @PathVariable Long itemId,
+                              @RequestBody ItemDto itemDto) {
+        return itemService.updateItem(userId, itemId, itemDto);
     }
 
     @GetMapping("/{itemId}")
@@ -42,11 +37,8 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByOwner(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId) {
-        if (userId == null) {
-            throw new RuntimeException("Требуется заголовок X-Sharer-User-Id");
-        }
-        return itemService.getAllItemsByOwner(userId);
+    public List<ItemDto> getItemsByUserId(@RequestHeader(USER_ID_HEADER) Long userId) {
+        return itemService.getItemsByUserId(userId);
     }
 
     @GetMapping("/search")

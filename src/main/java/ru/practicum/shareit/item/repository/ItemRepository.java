@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-
 @Component
 public class ItemRepository {
     private final AtomicLong idCounter = new AtomicLong(0);
@@ -32,15 +31,22 @@ public class ItemRepository {
                 .collect(Collectors.toList());
     }
 
+    // ДОБАВЬТЕ ЭТОТ МЕТОД
+    public List<Item> findByOwnerId(Long ownerId) {
+        return items.values().stream()
+                .filter(item -> item.getOwner() != null &&
+                        Objects.equals(item.getOwner().getId(), ownerId))
+                .collect(Collectors.toList());
+    }
+
     public List<Item> search(String text) {
-        // Если текст пустой, возвращаем пустой список
         if (text == null || text.isBlank()) {
             return List.of();
         }
 
         String lowerCaseText = text.toLowerCase();
         return items.values().stream()
-                .filter(item -> item.getAvailable() != null && item.getAvailable())  // Только доступные
+                .filter(item -> item.getAvailable() != null && item.getAvailable())
                 .filter(item -> {
                     String name = item.getName() != null ? item.getName().toLowerCase() : "";
                     String description = item.getDescription() != null ? item.getDescription().toLowerCase() : "";
