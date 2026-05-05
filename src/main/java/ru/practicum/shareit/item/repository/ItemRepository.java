@@ -31,7 +31,6 @@ public class ItemRepository {
                 .collect(Collectors.toList());
     }
 
-    // ДОБАВЬТЕ ЭТОТ МЕТОД
     public List<Item> findByOwnerId(Long ownerId) {
         return items.values().stream()
                 .filter(item -> item.getOwner() != null &&

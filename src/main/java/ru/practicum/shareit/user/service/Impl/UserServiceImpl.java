@@ -25,7 +25,6 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
         log.info("Creating user with email: {}", userDto.getEmail());
 
-        // Проверка на дублирование email
         if (userRepository.existsByEmail(userDto.getEmail())) {
             log.warn("User with email {} already exists", userDto.getEmail());
             throw new ConflictException("User with email " + userDto.getEmail() + " already exists");
@@ -48,7 +47,6 @@ public class UserServiceImpl implements UserService {
                     return new NotFoundException("User not found with id: " + userId);
                 });
 
-        // Обновление email (если передан и отличается от текущего)
         if (userDto.getEmail() != null && !userDto.getEmail().equals(existingUser.getEmail())) {
             if (userRepository.existsByEmail(userDto.getEmail())) {
                 log.warn("Email {} already in use", userDto.getEmail());
@@ -57,7 +55,6 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(userDto.getEmail());
         }
 
-        // Обновление имени (если передано)
         if (userDto.getName() != null && !userDto.getName().isBlank()) {
             existingUser.setName(userDto.getName());
         }

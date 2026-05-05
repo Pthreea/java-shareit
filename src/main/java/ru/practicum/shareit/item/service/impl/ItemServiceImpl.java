@@ -29,7 +29,6 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(Long userId, ItemDto itemDto) {
         log.info("Creating item for user with id: {}", userId);
 
-        // Проверка существования пользователя
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("User not found with id: {}", userId);
@@ -49,26 +48,22 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
         log.info("Updating item with id: {} by user: {}", itemId, userId);
 
-        // Проверка существования пользователя
         if (!userRepository.existsById(userId)) {
             log.warn("User not found with id: {}", userId);
             throw new NotFoundException("User not found with id: " + userId);
         }
 
-        // Проверка существования вещи
         Item existingItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> {
                     log.warn("Item not found with id: {}", itemId);
                     return new NotFoundException("Item not found with id: " + itemId);
                 });
 
-        // Проверка что пользователь - владелец вещи
         if (!existingItem.getOwner().getId().equals(userId)) {
             log.warn("User {} is not owner of item {}", userId, itemId);
             throw new ForbiddenException("User is not owner of this item");
         }
 
-        // Обновление полей (только если переданы)
         if (itemDto.getName() != null && !itemDto.getName().isBlank()) {
             existingItem.setName(itemDto.getName());
         }
@@ -108,7 +103,6 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("User not found with id: " + userId);
         }
 
-        // ИСПОЛЬЗУЙТЕ findByOwnerId
         List<ItemDto> items = itemRepository.findByOwnerId(userId).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
