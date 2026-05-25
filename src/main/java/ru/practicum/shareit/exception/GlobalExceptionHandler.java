@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
-/**
- * Глобальный обработчик исключений для REST API.
- * Перехватывает исключения и возвращает унифицированные HTTP-ответы.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -27,13 +23,6 @@ public class GlobalExceptionHandler {
     private static final String MESSAGE_INTERNAL_ERROR = "Внутренняя ошибка сервера";
     private static final String MESSAGE_DATA_PROCESSING_ERROR = "Ошибка обработки данных";
 
-    /**
-     * Обрабатывает все RuntimeException и определяет HTTP-статус по содержимому сообщения.
-     * Используется для backward compatibility с существующим кодом, который бросает RuntimeException с текстовыми сообщениями.
-     *
-     * @param ex перехваченное исключение
-     * @return ResponseEntity с соответствующим HTTP-статусом и сообщением об ошибке
-     */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
         String message = ex.getMessage();
@@ -59,38 +48,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGE_INTERNAL_ERROR);
     }
 
-    /**
-     * Обрабатывает NullPointerException, возникающие при попытке обращения к null-объектам.
-     * Возвращает 500 Internal Server Error, так как такие ошибки указывают на проблемы в коде.
-     *
-     * @param ex перехваченное исключение
-     * @return ResponseEntity с HTTP 500 и сообщением об ошибке
-     */
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<Map<String, String>> handleNullPointer(NullPointerException ex) {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGE_DATA_PROCESSING_ERROR);
     }
 
-    /**
-     * Обрабатывает IllegalArgumentException, возникающие при передаче некорректных параметров.
-     * Возвращает 400 Bad Request с исходным сообщением об ошибке.
-     *
-     * @param ex перехваченное исключение
-     * @return ResponseEntity с HTTP 400 и сообщением об ошибке
-     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    /**
-     * Вспомогательный метод для построения унифицированного ответа об ошибке.
-     * Инкапсулирует логику создания ResponseEntity, избегая дублирования кода.
-     *
-     * @param status HTTP-статус ответа
-     * @param message текст сообщения об ошибке
-     * @return ResponseEntity с указанным статусом и сообщением
-     */
     private ResponseEntity<Map<String, String>> buildErrorResponse(HttpStatus status, String message) {
         return ResponseEntity
                 .status(status)

@@ -2,16 +2,26 @@ package ru.practicum.shareit.request.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.user.dto.UserMapper;
 
-@Mapper(componentModel = "spring", uses = UserMapper.class)
+/**
+ * Маппер для преобразования между ItemRequest и ItemRequestDto.
+ */
+@Mapper(componentModel = "spring")
 public interface ItemRequestMapper {
 
-    ItemRequestDto toItemRequestDto(ItemRequest itemRequest);
-
+    /**
+     * Преобразует DTO в сущность.
+     * Поля requestor и created устанавливаются вручную в сервисе.
+     */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "created", ignore = true)
     @Mapping(target = "requestor", ignore = true)
-    ItemRequest toItemRequest(ItemRequestDto itemRequestDto);
+    @Mapping(target = "created", ignore = true)
+    ItemRequest toItemRequest(ItemRequestDto dto);
+
+    /**
+     * Преобразует сущность в DTO.
+     */
+    ItemRequestDto toItemRequestDto(ItemRequest entity);
 }
