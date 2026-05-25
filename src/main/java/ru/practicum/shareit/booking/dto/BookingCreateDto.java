@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.model.BookingStatus;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -16,9 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingDto {
-
-    private Long id;
+public class BookingCreateDto {
 
     @NotNull(message = "Start date is required")
     @FutureOrPresent(message = "Start date must be in present or future")
@@ -32,30 +29,4 @@ public class BookingDto {
 
     @NotNull(message = "Item id is required")
     private Long itemId;
-
-    private Long bookerId;
-
-    private BookingStatus status;
-
-    // Вложенные объекты для детального ответа
-    private ItemDto item;
-    private UserDto booker;
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ItemDto {
-        private Long id;
-        private String name;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserDto {
-        private Long id;
-        private String name;
-    }
 }
