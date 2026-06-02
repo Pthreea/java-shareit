@@ -37,7 +37,6 @@ public class BookingDto {
 
     private BookingStatus status;
 
-    // Вложенные объекты для детального ответа
     private ItemDto item;
     private UserDto booker;
 
