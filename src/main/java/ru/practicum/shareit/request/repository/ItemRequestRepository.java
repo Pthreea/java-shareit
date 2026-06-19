@@ -1,39 +1,13 @@
 package ru.practicum.shareit.request.repository;
 
-import org.springframework.stereotype.Component;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
 
-@Component
-public class ItemRequestRepository {
-    private final AtomicLong idCounter = new AtomicLong(0);
-    private final Map<Long, ItemRequest> requests = new HashMap<>();
+@Repository
+public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> {
 
-    public ItemRequest save(ItemRequest itemRequest) {
-        if (itemRequest.getId() == null) {
-            long newId = idCounter.incrementAndGet();
-            itemRequest.setId(newId);
-        }
-        requests.put(itemRequest.getId(), itemRequest);
-        return itemRequest;
-    }
-
-    public Optional<ItemRequest> findById(Long id) {
-        return Optional.ofNullable(requests.get(id));
-    }
-
-    public List<ItemRequest> findAllByRequestor(User requestor) {
-        return requests.values().stream()
-                .filter(request -> Objects.equals(request.getRequestor().getId(), requestor.getId()))
-                .collect(Collectors.toList());
-    }
-
-    public List<ItemRequest> findAll() {
-        return new ArrayList<>(requests.values());
-    }
+    List<ItemRequest> findByRequestorIdOrderByCreatedDesc(Long requestorId);
 }

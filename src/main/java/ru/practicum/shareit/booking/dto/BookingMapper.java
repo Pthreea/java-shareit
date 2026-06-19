@@ -1,21 +1,39 @@
 package ru.practicum.shareit.booking.dto;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.user.dto.UserMapper;
 
+@Component
+public class BookingMapper {
 
-@Mapper(componentModel = "spring", uses = {ItemMapper.class, UserMapper.class})
-public interface BookingMapper {
+    public Booking toBooking(BookingCreateDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        return Booking.builder()
+                .start(dto.getStart())
+                .end(dto.getEnd())
+                .build();
+    }
 
-    @Mapping(target = "itemId", source = "item.id")
-    BookingDto toBookingDto(Booking booking);
+    public BookingDto toBookingDto(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", constant = "WAITING")
-    @Mapping(target = "item", ignore = true)
-    @Mapping(target = "booker", ignore = true)
-    Booking toBooking(BookingDto bookingDto);
+        return BookingDto.builder()
+                .id(booking.getId())
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .status(booking.getStatus())
+                .item(booking.getItem() != null ? BookingDto.ItemDto.builder()
+                        .id(booking.getItem().getId())
+                        .name(booking.getItem().getName())
+                        .build() : null)
+                .booker(booking.getBooker() != null ? BookingDto.UserDto.builder()
+                        .id(booking.getBooker().getId())
+                        .name(booking.getBooker().getName())
+                        .build() : null)
+                .build();
+    }
 }

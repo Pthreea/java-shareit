@@ -12,10 +12,6 @@ import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-/**
- * REST-контроллер для управления запросами вещей.
- * Обрабатывает HTTP-запросы для создания и получения запросов на вещи.
- */
 @Slf4j
 @RestController
 @RequestMapping("/requests")
@@ -27,14 +23,6 @@ public class ItemRequestController {
 
     private final ItemRequestService itemRequestService;
 
-    /**
-     * Создает новый запрос на вещь.
-     *
-     * @param itemRequestDto данные запроса
-     * @param userId идентификатор пользователя из заголовка
-     * @return созданный запрос с HTTP-статусом 201 Created
-     * @throws BadRequestException если заголовок X-Sharer-User-Id не передан
-     */
     @PostMapping
     public ResponseEntity<ItemRequestDto> createRequest(
             @Valid @RequestBody ItemRequestDto itemRequestDto,
@@ -49,14 +37,6 @@ public class ItemRequestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
     }
 
-    /**
-     * Получает все запросы текущего пользователя.
-     * Запросы возвращаются с информацией об ответах (предложенных вещах).
-     *
-     * @param userId идентификатор пользователя из заголовка
-     * @return список запросов пользователя
-     * @throws BadRequestException если заголовок X-Sharer-User-Id не передан
-     */
     @GetMapping
     public ResponseEntity<List<ItemRequestDto>> getAllRequestsByUser(
             @RequestHeader(value = USER_ID_HEADER, required = false) Long userId) {
@@ -70,14 +50,6 @@ public class ItemRequestController {
         return ResponseEntity.ok(requests);
     }
 
-    /**
-     * Получает все запросы других пользователей постранично.
-     * Позволяет пользователю просматривать запросы, чтобы предложить свои вещи.
-     *
-     * @param userId идентификатор пользователя из заголовка
-     * @return список всех запросов кроме запросов текущего пользователя
-     * @throws BadRequestException если заголовок X-Sharer-User-Id не передан
-     */
     @GetMapping("/all")
     public ResponseEntity<List<ItemRequestDto>> getAllRequests(
             @RequestHeader(value = USER_ID_HEADER, required = false) Long userId) {
@@ -91,15 +63,6 @@ public class ItemRequestController {
         return ResponseEntity.ok(requests);
     }
 
-    /**
-     * Получает конкретный запрос по идентификатору.
-     * Доступен любому авторизованному пользователю.
-     *
-     * @param requestId идентификатор запроса
-     * @param userId идентификатор пользователя из заголовка
-     * @return данные запроса с предложенными вещами
-     * @throws BadRequestException если заголовок X-Sharer-User-Id не передан
-     */
     @GetMapping("/{requestId}")
     public ResponseEntity<ItemRequestDto> getRequestById(
             @PathVariable Long requestId,
@@ -114,13 +77,6 @@ public class ItemRequestController {
         return ResponseEntity.ok(request);
     }
 
-    /**
-     * Валидирует наличие идентификатора пользователя в заголовке.
-     * Бросает BadRequestException если userId равен null.
-     *
-     * @param userId идентификатор пользователя для валидации
-     * @throws BadRequestException если userId равен null
-     */
     private void validateUserId(Long userId) {
         if (userId == null) {
             log.warn("Request without required header: {}", USER_ID_HEADER);
