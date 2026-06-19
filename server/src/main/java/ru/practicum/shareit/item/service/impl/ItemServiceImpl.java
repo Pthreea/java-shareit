@@ -114,7 +114,6 @@ public class ItemServiceImpl implements ItemService {
         if (item.getOwner().getId().equals(userId)) {
             LocalDateTime now = LocalDateTime.now();
 
-            // Получаем первый элемент из списка
             lastBooking = bookingRepository
                     .findLastBookingByItemId(itemId, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
                     .stream()
@@ -160,7 +159,6 @@ public class ItemServiceImpl implements ItemService {
         Map<Long, BookingDto> nextBookings = new HashMap<>();
 
         for (Long id : itemIds) {
-            // Получаем первый элемент из списка для lastBooking
             BookingDto lastBooking = bookingRepository
                     .findLastBookingByItemId(id, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
                     .stream()
@@ -169,7 +167,6 @@ public class ItemServiceImpl implements ItemService {
                     .orElse(null);
             lastBookings.put(id, lastBooking);
 
-            // Получаем первый элемент из списка для nextBooking
             BookingDto nextBooking = bookingRepository
                     .findNextBookingByItemId(id, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
                     .stream()
