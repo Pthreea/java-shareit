@@ -113,13 +113,19 @@ public class ItemServiceImpl implements ItemService {
 
         if (item.getOwner().getId().equals(userId)) {
             LocalDateTime now = LocalDateTime.now();
-            // Исправление: передаём Pageable
+
+            // Получаем первый элемент из списка
             lastBooking = bookingRepository
                     .findLastBookingByItemId(itemId, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
+                    .stream()
+                    .findFirst()
                     .map(bookingMapper::toBookingDto)
                     .orElse(null);
+
             nextBooking = bookingRepository
                     .findNextBookingByItemId(itemId, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
+                    .stream()
+                    .findFirst()
                     .map(bookingMapper::toBookingDto)
                     .orElse(null);
         }
@@ -138,7 +144,9 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
 
-        List<Long> itemIds = items.stream().map(Item::getId).collect(Collectors.toList());
+        List<Long> itemIds = items.stream()
+                .map(Item::getId)
+                .collect(Collectors.toList());
 
         List<Comment> comments = commentRepository.findByItemIdInOrderByCreatedDesc(itemIds);
         Map<Long, List<CommentDto>> commentsByItemId = comments.stream()
@@ -152,14 +160,23 @@ public class ItemServiceImpl implements ItemService {
         Map<Long, BookingDto> nextBookings = new HashMap<>();
 
         for (Long id : itemIds) {
-            lastBookings.put(id,
-                    bookingRepository.findLastBookingByItemId(id, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
-                            .map(bookingMapper::toBookingDto)
-                            .orElse(null));
-            nextBookings.put(id,
-                    bookingRepository.findNextBookingByItemId(id, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
-                            .map(bookingMapper::toBookingDto)
-                            .orElse(null));
+            // Получаем первый элемент из списка для lastBooking
+            BookingDto lastBooking = bookingRepository
+                    .findLastBookingByItemId(id, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
+                    .stream()
+                    .findFirst()
+                    .map(bookingMapper::toBookingDto)
+                    .orElse(null);
+            lastBookings.put(id, lastBooking);
+
+            // Получаем первый элемент из списка для nextBooking
+            BookingDto nextBooking = bookingRepository
+                    .findNextBookingByItemId(id, now, BookingStatus.APPROVED, PageRequest.of(0, 1))
+                    .stream()
+                    .findFirst()
+                    .map(bookingMapper::toBookingDto)
+                    .orElse(null);
+            nextBookings.put(id, nextBooking);
         }
 
         return items.stream()

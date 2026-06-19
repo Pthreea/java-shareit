@@ -91,7 +91,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.start > :now " +
             "AND b.status = :status " +
             "ORDER BY b.start ASC")
-    Optional<Booking> findNextBookingByItemId(
+    List<Booking> findNextBookingByItemId(
             @Param("itemId") Long itemId,
             @Param("now") LocalDateTime now,
             @Param("status") BookingStatus status,
