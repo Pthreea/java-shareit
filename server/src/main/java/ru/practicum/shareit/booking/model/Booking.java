@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @Table(name = "bookings")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Booking {
 
     @Id
@@ -26,11 +26,11 @@ public class Booking {
     @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "booker_id", nullable = false)
     private User booker;
 

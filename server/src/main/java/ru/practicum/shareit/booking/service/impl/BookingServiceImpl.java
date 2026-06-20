@@ -39,45 +39,56 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto createBooking(BookingCreateDto bookingDto, Long userId) {
-        log.info("Creating booking for user {} and item {}", userId, bookingDto.getItemId());
+        log.info("=== Creating booking ===");
+        log.info("Request: userId={}, itemId={}, start={}, end={}",
+                userId, bookingDto.getItemId(), bookingDto.getStart(), bookingDto.getEnd());
 
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart()) ||
-                bookingDto.getEnd().equals(bookingDto.getStart())) {
-            log.warn("End date must be after start date");
-            throw new BadRequestException("End date must be after start date");
+        try {
+            if (bookingDto.getEnd().isBefore(bookingDto.getStart()) ||
+                    bookingDto.getEnd().equals(bookingDto.getStart())) {
+                throw new BadRequestException("End date must be after start date");
+            }
+
+            User booker = userRepository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+            log.info("Booker found: id={}, name={}", booker.getId(), booker.getName());
+
+            Item item = itemRepository.findById(bookingDto.getItemId())
+                    .orElseThrow(() -> new NotFoundException("Item not found with id: " + bookingDto.getItemId()));
+            log.info("Item found: id={}, name={}, ownerId={}", item.getId(), item.getName(), item.getOwner().getId());
+
+            if (!item.getAvailable()) {
+                throw new BadRequestException("Item is not available for booking");
+            }
+
+            if (item.getOwner().getId().equals(userId)) {
+                throw new NotFoundException("Cannot book your own item");
+            }
+
+            // Создание бронирования
+            Booking booking = bookingMapper.toBooking(bookingDto);
+            booking.setItem(item);
+            booking.setBooker(booker);
+            booking.setStatus(BookingStatus.WAITING);
+
+            log.info("Saving booking...");
+            Booking savedBooking = bookingRepository.save(booking);
+            log.info("Booking saved: id={}, status={}", savedBooking.getId(), savedBooking.getStatus());
+
+            log.info("Converting to DTO...");
+            BookingDto result = bookingMapper.toBookingDto(savedBooking);
+            log.info("DTO created: {}", result);
+
+            log.info("=== Booking created successfully ===");
+            return result;
+
+        } catch (NotFoundException | BadRequestException e) {
+            log.warn("Business exception: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error creating booking", e);
+            throw new RuntimeException("Failed to create booking", e);
         }
-
-        User booker = userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.warn("User not found with id: {}", userId);
-                    return new NotFoundException("User not found with id: " + userId);
-                });
-
-        Item item = itemRepository.findById(bookingDto.getItemId())
-                .orElseThrow(() -> {
-                    log.warn("Item not found with id: {}", bookingDto.getItemId());
-                    return new NotFoundException("Item not found with id: " + bookingDto.getItemId());
-                });
-
-        if (!item.getAvailable()) {
-            log.warn("Item {} is not available for booking", item.getId());
-            throw new BadRequestException("Item is not available for booking");
-        }
-
-        if (item.getOwner().getId().equals(userId)) {
-            log.warn("User {} tried to book own item {}", userId, item.getId());
-            throw new NotFoundException("Cannot book your own item");
-        }
-
-        Booking booking = bookingMapper.toBooking(bookingDto);
-        booking.setItem(item);
-        booking.setBooker(booker);
-        booking.setStatus(BookingStatus.WAITING);
-
-        Booking savedBooking = bookingRepository.save(booking);
-        log.info("Booking created successfully with id: {}", savedBooking.getId());
-
-        return bookingMapper.toBookingDto(savedBooking);
     }
 
     @Override
