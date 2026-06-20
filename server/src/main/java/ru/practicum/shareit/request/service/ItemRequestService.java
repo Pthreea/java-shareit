@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -54,10 +53,7 @@ public class ItemRequestService {
             throw new NotFoundException("User not found");
         }
 
-        List<ItemRequest> requests = requestRepository.findByRequestorId(
-                userId,
-                Sort.by(Sort.Direction.DESC, "created")
-        );
+        List<ItemRequest> requests = requestRepository.findByRequestorId(userId);
 
         return enrichWithItems(requests);
     }
@@ -69,10 +65,7 @@ public class ItemRequestService {
             throw new NotFoundException("User not found");
         }
 
-        List<ItemRequest> requests = requestRepository.findByRequestorIdNot(
-                userId,
-                Sort.by(Sort.Direction.DESC, "created")
-        );
+        List<ItemRequest> requests = requestRepository.findByRequestorIdNot(userId);
 
         return enrichWithItems(requests);
     }

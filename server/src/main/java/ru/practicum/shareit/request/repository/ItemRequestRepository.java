@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.repository;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,10 +9,9 @@ import java.util.List;
 
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> {
 
-    // Запросы пользователя
-    List<ItemRequest> findByRequestorId(Long requestorId, Sort sort);
+    @Query("SELECT r FROM ItemRequest r WHERE r.requestor.id = :userId ORDER BY r.created DESC")
+    List<ItemRequest> findByRequestorId(@Param("userId") Long userId);
 
-    // Запросы других пользователей
-    @Query("SELECT r FROM ItemRequest r WHERE r.requestor.id != :userId")
-    List<ItemRequest> findByRequestorIdNot(@Param("userId") Long userId, Sort sort);
+    @Query("SELECT r FROM ItemRequest r WHERE r.requestor.id <> :userId ORDER BY r.created DESC")
+    List<ItemRequest> findByRequestorIdNot(@Param("userId") Long userId);
 }

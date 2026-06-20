@@ -132,6 +132,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Jackson для JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

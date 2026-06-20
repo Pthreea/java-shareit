@@ -12,41 +12,49 @@ public class ItemMapper {
 
     public Item toItem(ItemDto dto) {
         if (dto == null) return null;
-        Item item = new Item();
-        item.setName(dto.getName());
-        item.setDescription(dto.getDescription());
-        item.setAvailable(dto.getAvailable());
-        return item;
+
+        return Item.builder()
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .available(dto.getAvailable())
+                .build();
     }
 
     public ItemDto toItemDto(Item item) {
         if (item == null) return null;
-        ItemDto dto = new ItemDto();
-        dto.setId(item.getId());
-        dto.setName(item.getName());
-        dto.setDescription(item.getDescription());
-        dto.setAvailable(item.getAvailable());
-        if (item.getOwner() != null) {
-            dto.setOwnerId(item.getOwner().getId());
-        }
-        if (item.getRequest() != null) {
-            dto.setRequestId(item.getRequest().getId());
-        }
-        return dto;
+
+        return ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .ownerId(item.getOwner() != null ? item.getOwner().getId() : null)
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null)
+                .build();
     }
 
     public ItemDto toItemDtoWithBookingsAndComments(Item item,
                                                     BookingDto lastBooking,
                                                     BookingDto nextBooking,
                                                     List<CommentDto> comments) {
-        ItemDto dto = toItemDto(item);
-        dto.setLastBooking(lastBooking);
-        dto.setNextBooking(nextBooking);
-        dto.setComments(comments);
-        return dto;
+        if (item == null) return null;
+
+        return ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .ownerId(item.getOwner() != null ? item.getOwner().getId() : null)
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null)
+                .lastBooking(lastBooking)
+                .nextBooking(nextBooking)
+                .comments(comments)
+                .build();
     }
 
     public List<ItemDto> toItemDtoList(List<Item> items) {
-        return items.stream().map(this::toItemDto).collect(Collectors.toList());
+        return items.stream()
+                .map(this::toItemDto)
+                .collect(Collectors.toList());
     }
 }
